@@ -1,0 +1,54 @@
+ChatGPT says this about building a physics engine sandbox:
+
+    1. Almost all physics engines have this general loop
+        
+        accumulateForces();     // Sum gravity, springs, drag, thrusters, etc... for each object
+        integrateBodies(dt);    // Update positions and velocities using chosen integrator (implicit Euler to start -> Runge Kutta later)
+        detectCollisions();     // Find overlapping bodies
+        resolveCollisions();    // Apply impulses so bodies separate and conserve momentum
+        clearForces();          // Reset force accumulator so the next frame starts fresh
+
+    2. Start Simple: Particles -> Rigid Bodies
+        
+        Start with modelling particles (simple points) with velocity, position, and mass.
+
+        Later, upgrade a particle into a rigid body that also has:
+            
+            - Orientation (angle for 2D)
+            - Angular velocity and acceleration
+            - Moment of Inertia
+            - Torque Accumulator
+
+        This opens the door to rotations, collisions that spin objects, etc...
+
+    3. The "World" Class
+        
+        Instead of simulating everything in main(), create a World/PhysicsEngine class
+
+        class PhysicsEngine {
+            public:
+                std::vector<RigidBody*> bodies;
+                Vec2 gravity = {0.0f, -9.81f};
+
+                void step(float dt) {
+                    accumulateForces();
+                    integrateBodies(dt);
+                    detectCollisions();
+                    resolveCollisions();
+                }
+
+            private:
+                void accumulateForces();
+                void integrateBodies(float dt);
+                void detectCollisions();
+                void resolveCollisions();
+            };
+
+        This way, i can drop things into the PhysicsEngine without having to rewrite the loop.
+        Forces like gravity are applied automatically.
+        I can run (physicsengine.step(1.0f/60.0f) from a game loop or test harness.
+
+    4. Forces as pluggable components
+
+
+
